@@ -9,161 +9,143 @@ import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
-  console.log(contacts);
-  
-  const addContact = (event) => {
+  const [filter, setFilter] = useState('');
+
+  const addContact = event => {
     event.preventDefault();
     const valueName = event.currentTarget.elements.name.value;
     const valueNumber = event.currentTarget.elements.number.value;
     let newContact;
     if (contacts.some(element => element.name === valueName)) {
-            return Notiflix.Notify.warning(`${valueName} is already in contacts`);
-          } else {
-            newContact= 
-              {
-              name: valueName,
-              number: valueNumber,
-              id: nanoid(),
-            }
-          }
-    setContacts([...contacts,newContact])
+      return Notiflix.Notify.warning(`${valueName} is already in contacts`);
+    } else {
+      newContact = {
+        name: valueName,
+        number: valueNumber,
+        id: nanoid(),
+      };
     }
+    setContacts([...contacts, newContact]);
+    resetForm(event);
+  };
 
-  return(
+  const addCurrentValue = event => {
+    const value = event.target.value;
+    setFilter(value);
+  };
+
+  const resetForm = event => {
+    event.target.name.value = '';
+    event.target.number.value = '';
+    setFilter('');
+  };
+
+  const filterContacts = () => {
+    const filteredArray = [];
+    contacts.filter(element => {
+      if (element.name.includes(filter)) {
+        filteredArray.push(element);
+      }
+      return filteredArray;
+    });
+    return filteredArray;
+  };
+
+  const deleteContact = id => {
+    const newContacts = contacts.filter(contact => contact.id !== id);
+    setContacts(newContacts);
+  };
+
+  return (
     <>
-    <h1>Phonebook</h1>
-    <Section>
-      <ErrorBoundary>
-         <ContactForm nameTitle='Name' numberTitle='Number' addContact={addContact}/>
-      </ErrorBoundary>
-    </Section>
+      <h1>Phonebook</h1>
+      <Section>
+        <ErrorBoundary>
+          <ContactForm
+            nameTitle="Name"
+            numberTitle="Number"
+            addContact={addContact}
+          />
+        </ErrorBoundary>
+
+        <h2>Contacts</h2>
+        <ErrorBoundary>
+          <Filter
+            filterTitle={'Finds contacts by name'}
+            inputFilterValue={filter}
+            addCurrentValue={addCurrentValue}
+          />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <ContactList names={filterContacts()} btnAction={deleteContact} />
+        </ErrorBoundary>
+      </Section>
     </>
-  )
-}
+  );
+};
 
-// class App extends Component {
-//   state = {
-//     contacts: [],
-//     filter: '',
-//   };
+// useEffect(()=>{
+//   console.log(JSON.parse(localStorage.getItem('contacts')));
+//   setContacts(JSON.parse(localStorage.getItem('contacts')));
+//   // console.log(contacts);
+// },[])
 
-//   resetForm = event => {
-//     event.target.name.value = '';
-//     event.target.number.value = '';
-//     this.setState({
-//       filter: '',
-//     });
-//   };
-
-//   saveContactsToStorage = () => {
-//     try {
-//       localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-//   addContact = evt => {
-//     evt.preventDefault();
-//     const valueName = evt.currentTarget.elements.name.value;
-//     const valueNumber = evt.currentTarget.elements.number.value;
-//     if (this.state.contacts.some(element => element.name === valueName)) {
-//       return Notiflix.Notify.warning(`${valueName} is already in contacts`);
-//     } else {
-//       this.setState(prevState => {
-//         return {
-//           contacts: [
-//             ...prevState.contacts,
-//             {
-//               name: valueName,
-//               number: valueNumber,
-//               id: nanoid(),
-//             },
-//           ],
-//         };
-//       });
-//     }
-//     this.resetForm(evt);
-//   };
-
-//   addCurrentValue = event => {
-//     const name = event.target.name;
-//     const value = event.target.value;
-//     this.setState({
-//       [name]: value,
-//     });
-//   };
-
-//   filterContacts = () => {
-//     const filteredArray = [];
-//     this.state.contacts.filter(element => {
-//       if (element.name.includes(this.state.filter)) {
-//         filteredArray.push(element); 
-//       }
-//       return filteredArray;
-//     });
-//     return filteredArray;
-//   };
-
-//   deleteContact = id => {
-//     const newContacts = [...this.state.contacts];
-//     const contacts = newContacts.filter(contact => contact.id !== id);
-//     this.setState({
-//       contacts,
-//     });
-//   };
-
-//   componentDidMount() {
-//     try {
-//       const contacts = JSON.parse(localStorage.getItem('contacts'));
-//       if (contacts) {
-//         this.setState({
-//           contacts: contacts,
-//         });
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
+// useEffect(()=>{
+//   let contactsWithStorage;
+//   if(contacts.length>JSON.parse(localStorage.getItem('contacts')).length){
+//     localStorage.setItem('contacts', JSON.stringify(contacts));
+//     contactsWithStorage = JSON.parse(localStorage.getItem('contacts'));
+//   }else{
+//     contactsWithStorage = contacts;
+//     console.log("dupa", contactsWithStorage);
+//     // console.log(contactsWithStorage);
 //   }
 
-//   componentDidUpdate(prevProps, prevState) {
-//     if (prevState.contacts.length !== this.state.contacts.length) {
-//       this.saveContactsToStorage();
+//   setContacts(contactsWithStorage)
+//   // localStorage.setItem('contacts', JSON.stringify([...contacts,...JSON.parse(localStorage.getItem('contacts'))]));
+
+//   // console.log(JSON.parse(localStorage.getItem('contacts')));
+// },[contacts])
+
+// const saveContactsToStorage = () => {
+//   try {
+//     localStorage.setItem('contacts', JSON.stringify(contacts));
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+// const getContactWithStorage = () => {
+//   let newContacts;
+//   try {
+//     const contactsWithStorage = JSON.parse(localStorage.getItem('contacts'));
+//     // setContacts(contactsWithStorage)
+//     if (contactsWithStorage) {
+//       newContacts = contactsWithStorage
 //     }
+//     console.log(contactsWithStorage);
+
+//   } catch (error) {
+//     console.log(error);
 //   }
-
-//   render() {
-//     return (
-//       <>
-//         <h1>Phonebook</h1>
-
-//         <Section>
-//           <ErrorBoundary>
-//             <ContactForm
-//               nameTitle={'Name'}
-//               numberTitle={'Number'}
-//               addContact={this.addContact}
-//             />
-//           </ErrorBoundary>
-
-//           <h2>Contacts</h2>
-//           <ErrorBoundary>
-//             <Filter
-//               filterTitle={'Finds contacts by name'}
-//               inputFilterValue={this.state.filter}
-//               addCurrentValue={this.addCurrentValue}
-//             />
-//           </ErrorBoundary>
-//           <ErrorBoundary>
-//             <ContactList
-//               names={this.filterContacts()}
-//               btnAction={this.deleteContact}
-//             />
-//           </ErrorBoundary>
-//         </Section>
-//       </>
-//     );
-//   }
+//   setContacts(newContacts)
 // }
+
+// useEffect(()=>{
+
+//   getContactWithStorage();
+//   console.log("getContactWithStorage", contacts);
+// },[])
+
+// useEffect(()=>{
+
+//   // saveContactsToStorage()
+//   try {
+//     localStorage.setItem('contacts', JSON.stringify(contacts));
+//   } catch (error) {
+//     console.log(error);
+//   }
+//   console.log("saveContactsToStorage", contacts);
+// },[contacts])
 
 export default App;

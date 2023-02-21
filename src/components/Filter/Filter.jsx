@@ -21,5 +21,5 @@ Filter.propTypes = {
   inputFilterValue: PropTypes.string,
   addCurrentValue: PropTypes.func,
 };
-
+ 
 export default Filter;
