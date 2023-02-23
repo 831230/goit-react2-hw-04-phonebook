@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { nanoid } from 'nanoid';
 import Notiflix from 'notiflix';
 import Section from 'components/Section/Section';
@@ -8,7 +8,9 @@ import ContactList from 'components/ContactList/ContactList';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 const App = () => {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem('contacts')) || []
+  );
   const [filter, setFilter] = useState('');
 
   const addContact = event => {
@@ -27,6 +29,7 @@ const App = () => {
     }
     setContacts([...contacts, newContact]);
     resetForm(event);
+    // localStorage.setItem('contacts', JSON.stringify(contacts));
   };
 
   const addCurrentValue = event => {
@@ -56,6 +59,10 @@ const App = () => {
     setContacts(newContacts);
   };
 
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
   return (
     <>
       <h1>Phonebook</h1>
@@ -83,69 +90,5 @@ const App = () => {
     </>
   );
 };
-
-// useEffect(()=>{
-//   console.log(JSON.parse(localStorage.getItem('contacts')));
-//   setContacts(JSON.parse(localStorage.getItem('contacts')));
-//   // console.log(contacts);
-// },[])
-
-// useEffect(()=>{
-//   let contactsWithStorage;
-//   if(contacts.length>JSON.parse(localStorage.getItem('contacts')).length){
-//     localStorage.setItem('contacts', JSON.stringify(contacts));
-//     contactsWithStorage = JSON.parse(localStorage.getItem('contacts'));
-//   }else{
-//     contactsWithStorage = contacts;
-//     console.log("dupa", contactsWithStorage);
-//     // console.log(contactsWithStorage);
-//   }
-
-//   setContacts(contactsWithStorage)
-//   // localStorage.setItem('contacts', JSON.stringify([...contacts,...JSON.parse(localStorage.getItem('contacts'))]));
-
-//   // console.log(JSON.parse(localStorage.getItem('contacts')));
-// },[contacts])
-
-// const saveContactsToStorage = () => {
-//   try {
-//     localStorage.setItem('contacts', JSON.stringify(contacts));
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// const getContactWithStorage = () => {
-//   let newContacts;
-//   try {
-//     const contactsWithStorage = JSON.parse(localStorage.getItem('contacts'));
-//     // setContacts(contactsWithStorage)
-//     if (contactsWithStorage) {
-//       newContacts = contactsWithStorage
-//     }
-//     console.log(contactsWithStorage);
-
-//   } catch (error) {
-//     console.log(error);
-//   }
-//   setContacts(newContacts)
-// }
-
-// useEffect(()=>{
-
-//   getContactWithStorage();
-//   console.log("getContactWithStorage", contacts);
-// },[])
-
-// useEffect(()=>{
-
-//   // saveContactsToStorage()
-//   try {
-//     localStorage.setItem('contacts', JSON.stringify(contacts));
-//   } catch (error) {
-//     console.log(error);
-//   }
-//   console.log("saveContactsToStorage", contacts);
-// },[contacts])
 
 export default App;
