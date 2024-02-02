@@ -29,7 +29,6 @@ const App = () => {
     }
     setContacts([...contacts, newContact]);
     resetForm(event);
-    // localStorage.setItem('contacts', JSON.stringify(contacts));
   };
 
   const addCurrentValue = event => {
